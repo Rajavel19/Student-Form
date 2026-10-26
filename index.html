@@ -1,0 +1,921 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkConnect - Find Your Work</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f3f6fb;
+  color: #172033;
+}
+
+header {
+  background: #152747;
+  color: white;
+  padding: 16px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: bold;
+  color: #70e1c1;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  border: none;
+  padding: 11px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  background: #2563eb;
+  color: white;
+}
+
+button:hover {
+  opacity: .86;
+}
+
+.secondary {
+  background: #e2e8f0;
+  color: #172033;
+}
+
+.danger {
+  background: #dc2626;
+}
+
+.success {
+  background: #059669;
+}
+
+.page {
+  display: none;
+  max-width: 1050px;
+  margin: 28px auto;
+  padding: 24px;
+}
+
+.page.active {
+  display: block;
+}
+
+.hero {
+  background: linear-gradient(135deg, #152747, #2563eb);
+  color: white;
+  border-radius: 18px;
+  padding: 45px 25px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 36px;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+.panel, .job-card, .report-card {
+  background: white;
+  padding: 22px;
+  border-radius: 14px;
+  margin-top: 20px;
+  box-shadow: 0 5px 20px #14213d12;
+}
+
+h2 {
+  margin-bottom: 18px;
+}
+
+h3 {
+  margin-bottom: 12px;
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccd5e2;
+  border-radius: 8px;
+  background: white;
+  font-size: 15px;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.category {
+  padding: 25px;
+  background: white;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 5px 20px #14213d12;
+}
+
+.category p {
+  margin: 12px 0;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.job-card p, .report-card p {
+  margin: 8px 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.muted {
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  padding: 25px;
+}
+
+.notice {
+  background: #fff7d6;
+  color: #704f00;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 14px;
+  line-height: 1.5;
+}
+
+footer {
+  text-align: center;
+  color: #64748b;
+  padding: 25px;
+}
+
+@media (max-width: 650px) {
+  header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  .full {
+    grid-column: auto;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .page {
+    padding: 14px;
+    margin: 15px auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">WorkConnect</div>
+  <nav>
+    <button class="secondary" onclick="go('homePage')">Home</button>
+    <button onclick="go('workerPage')">Find Work</button>
+    <button onclick="go('managerPage')">Manager</button>
+    <button class="danger" onclick="prepareGeneralReport()">Report Fake Work</button>
+    <button class="success" onclick="openCreatorDashboard()">Creator Dashboard</button>
+  </nav>
+</header>
+
+<!-- PAGE 1: HOME -->
+<section id="homePage" class="page active">
+  <div class="hero">
+    <h1>Find the Right Work for You</h1>
+    <p>WorkConnect connects workers with managers.</p>
+    <div class="actions" style="justify-content:center">
+      <button onclick="go('workerPage')">Find Work</button>
+      <button class="success" onclick="go('managerPage')">Post Work</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Choose a Work Category</h2>
+    <div class="grid">
+      <div class="category">
+        <h3>Educated Work</h3>
+        <p>Software, IT, office and degree-related opportunities.</p>
+        <button onclick="openJobs('Educated')">View Jobs</button>
+      </div>
+
+      <div class="category">
+        <h3>Non-Educated Work</h3>
+        <p>Catering, food service, watchman and other work.</p>
+        <button onclick="openJobs('Non-Educated')">View Jobs</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 2: WORKER DETAILS -->
+<section id="workerPage" class="page">
+  <div class="panel">
+    <h2>Find Your Work</h2>
+    <p class="muted">Enter your details to browse available work.</p>
+
+    <form id="workerForm">
+      <input id="wName" placeholder="Your name" required>
+      <input id="wAge" type="number" min="13" max="100"
+             placeholder="Your age" required>
+      <input id="wPlace" placeholder="Your place" required>
+      <input id="wPhone" type="tel" placeholder="Mobile number" required>
+
+      <select id="wCategory" class="full">
+        <option value="All">All work categories</option>
+        <option value="Educated">Educated Work</option>
+        <option value="Non-Educated">Non-Educated Work</option>
+      </select>
+
+      <button type="submit" class="full">Continue to Available Work</button>
+    </form>
+  </div>
+</section>
+
+<!-- PAGE 3: AVAILABLE JOBS AND PLACE SEARCH -->
+<section id="jobsPage" class="page">
+  <div class="panel">
+    <h2>Available Work</h2>
+    <p id="jobWelcome" class="muted"></p>
+
+    <div class="panel">
+      <h3>Search Jobs by Place</h3>
+      <p class="muted">Enter a town, city, or part of a place name.</p>
+
+      <form id="placeSearchForm">
+        <input id="placeSearch" class="full"
+               placeholder="Example: Coimbatore, Chennai, Karamadai">
+
+        <button type="submit" class="full">Search Jobs</button>
+
+        <button type="button" class="secondary full"
+                onclick="clearPlaceSearch()">
+          Clear Place Search
+        </button>
+      </form>
+
+      <p id="placeSearchMessage" class="muted" style="margin-top:12px"></p>
+    </div>
+
+    <div class="actions">
+      <button class="secondary" onclick="go('workerPage')">Back</button>
+      <button onclick="renderJobs()">Refresh Jobs</button>
+    </div>
+
+    <div id="jobsList" class="grid"></div>
+  </div>
+</section>
+
+<!-- PAGE 4: MANAGER -->
+<section id="managerPage" class="page">
+  <div class="panel">
+    <h2>Manager — Post or Update Work</h2>
+    <p class="muted">
+      Publish your work details so workers can search by location.
+    </p>
+
+    <form id="managerForm">
+      <input id="mName" placeholder="Manager name" required>
+      <input id="mWork" placeholder="Work name / job title" required>
+
+      <select id="mCategory" required>
+        <option value="Educated">Educated Work</option>
+        <option value="Non-Educated">Non-Educated Work</option>
+      </select>
+
+      <input id="mAge" type="number" min="18" max="100"
+             placeholder="Minimum worker age" required>
+      <input id="mPlace" placeholder="Work place / city" required>
+      <input id="mDate" type="date" required>
+      <input id="mDay" placeholder="Day (e.g. Monday)" required>
+      <input id="mSalary" placeholder="Salary / payment details" required>
+      <input id="mTiming" placeholder="Work timing" required>
+      <input id="mCount" type="number" min="1"
+             placeholder="Number of workers needed" required>
+      <input id="mPhone" type="tel" placeholder="Manager phone" required>
+      <input id="mEmail" type="email" placeholder="Manager email" required>
+
+      <button id="publishButton" type="submit" class="full">
+        Publish Work
+      </button>
+    </form>
+
+    <div id="managerMessage" class="notice" style="display:none"></div>
+
+    <div class="actions">
+      <button class="secondary" onclick="go('homePage')">Back Home</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Manage Posted Work</h2>
+    <div id="managerJobs" class="grid"></div>
+  </div>
+</section>
+
+<!-- PAGE 5: REPORT FAKE WORK -->
+<section id="reportPage" class="page">
+  <div class="panel">
+    <h2>Report Fake or Suspicious Work</h2>
+    <p class="muted">
+      Submit a report for review. Reporting alone does not prove wrongdoing.
+    </p>
+
+    <form id="reportForm">
+      <input id="rManager" placeholder="Manager / person name" required>
+      <input id="rWork" placeholder="Work name" required>
+      <input id="rPlace" placeholder="Work place" required>
+      <input id="rSalary" placeholder="Advertised salary">
+      <input id="rPhone" type="tel" placeholder="Phone number">
+      <input id="rEmail" type="email" placeholder="Email address">
+
+      <select id="rReason" required>
+        <option value="">Select report reason</option>
+        <option>Fake job listing</option>
+        <option>Asked for money to provide a job</option>
+        <option>Incorrect salary or job details</option>
+        <option>Suspicious contact details</option>
+        <option>Other concern</option>
+      </select>
+
+      <textarea id="rDetails" class="full"
+                placeholder="Explain the concern" required></textarea>
+
+      <button type="submit" class="danger full">Submit Report</button>
+    </form>
+
+    <div class="actions">
+      <button class="secondary" onclick="go('homePage')">Cancel</button>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 6: CREATOR DASHBOARD -->
+<section id="adminDashboard" class="page">
+  <div class="panel">
+    <h2>Creator Dashboard</h2>
+    <p class="muted">
+      Review reports and work listings before taking action.
+    </p>
+
+    <div class="notice">
+      This demo has no admin login. Anyone who can access the site can open
+      this dashboard. Add server-side authentication before public deployment.
+    </div>
+
+    <div class="actions">
+      <button onclick="renderAdmin()">Refresh Dashboard</button>
+      <button class="secondary" onclick="go('homePage')">Back Home</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Submitted Reports</h2>
+    <div id="reportsList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>All Published Work</h2>
+    <div id="adminJobs" class="grid"></div>
+  </div>
+</section>
+
+<footer>WorkConnect — Connecting People With Opportunities</footer>
+
+<script>
+const JOBS_KEY = "wc_jobs";
+const REPORTS_KEY = "wc_reports";
+
+let worker = null;
+let editingJobId = null;
+let searchedPlace = "";
+
+function readData(key) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+function makeId() {
+  return Date.now().toString(36) +
+         Math.random().toString(36).slice(2, 8);
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
+}
+
+function go(pageId) {
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
+  });
+
+  const page = document.getElementById(pageId);
+  if (!page) return;
+
+  page.classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  if (pageId === "managerPage") renderManagerJobs();
+  if (pageId === "jobsPage") renderJobs();
+  if (pageId === "adminDashboard") renderAdmin();
+
+  if (window.gsap) {
+    gsap.fromTo(page,
+      { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: 0.35 }
+    );
+  }
+}
+
+function openJobs(category) {
+  document.getElementById("wCategory").value = category;
+  go("workerPage");
+}
+
+document.getElementById("workerForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  worker = {
+    name: document.getElementById("wName").value.trim(),
+    age: Number(document.getElementById("wAge").value),
+    place: document.getElementById("wPlace").value.trim(),
+    phone: document.getElementById("wPhone").value.trim(),
+    category: document.getElementById("wCategory").value
+  };
+
+  document.getElementById("jobWelcome").textContent =
+    "Welcome, " + worker.name + ". Search for work by place below.";
+
+  searchedPlace = "";
+  document.getElementById("placeSearch").value = "";
+  document.getElementById("placeSearchMessage").textContent = "";
+
+  go("jobsPage");
+});
+
+document.getElementById("placeSearchForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  searchedPlace = document.getElementById("placeSearch")
+    .value.trim().toLowerCase();
+
+  if (!searchedPlace) {
+    document.getElementById("placeSearchMessage").textContent =
+      "Enter a place name to search, or clear the search to show all places.";
+  }
+
+  renderJobs();
+});
+
+function clearPlaceSearch() {
+  searchedPlace = "";
+  document.getElementById("placeSearch").value = "";
+  document.getElementById("placeSearchMessage").textContent = "";
+  renderJobs();
+}
+
+document.getElementById("managerForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const job = {
+    id: editingJobId || makeId(),
+    manager: document.getElementById("mName").value.trim(),
+    work: document.getElementById("mWork").value.trim(),
+    category: document.getElementById("mCategory").value,
+    minAge: Number(document.getElementById("mAge").value),
+    place: document.getElementById("mPlace").value.trim(),
+    date: document.getElementById("mDate").value,
+    day: document.getElementById("mDay").value.trim(),
+    salary: document.getElementById("mSalary").value.trim(),
+    timing: document.getElementById("mTiming").value.trim(),
+    count: Number(document.getElementById("mCount").value),
+    phone: document.getElementById("mPhone").value.trim(),
+    email: document.getElementById("mEmail").value.trim()
+  };
+
+  let jobs = readData(JOBS_KEY);
+
+  if (editingJobId) {
+    jobs = jobs.map(existing =>
+      existing.id === editingJobId ? job : existing
+    );
+  } else {
+    jobs.unshift(job);
+  }
+
+  saveData(JOBS_KEY, jobs);
+
+  editingJobId = null;
+  document.getElementById("managerForm").reset();
+  document.getElementById("publishButton").textContent = "Publish Work";
+
+  const message = document.getElementById("managerMessage");
+  message.textContent = "Work saved in this browser.";
+  message.style.display = "block";
+
+  renderManagerJobs();
+  renderJobs();
+});
+
+function renderJobs() {
+  const container = document.getElementById("jobsList");
+  const jobs = readData(JOBS_KEY);
+
+  const category = worker
+    ? worker.category
+    : document.getElementById("wCategory").value;
+
+  const age = worker ? worker.age : null;
+
+  const filtered = jobs.filter(job => {
+    const categoryMatch =
+      category === "All" || job.category === category;
+
+    const ageMatch =
+      age === null || age >= Number(job.minAge);
+
+    const jobPlace = String(job.place || "").trim().toLowerCase();
+
+    // Partial, case-insensitive place matching.
+    const placeMatch =
+      !searchedPlace || jobPlace.includes(searchedPlace);
+
+    return categoryMatch && ageMatch && placeMatch;
+  });
+
+  const message = document.getElementById("placeSearchMessage");
+
+  if (searchedPlace) {
+    message.textContent =
+      `Showing ${filtered.length} job(s) matching "${searchedPlace}".`;
+  } else if (message.textContent.startsWith("Showing ")) {
+    message.textContent = "";
+  }
+
+  if (!filtered.length) {
+    container.innerHTML =
+      '<div class="empty full">No matching jobs found. Try another place or clear the search.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(job => `
+    <article class="job-card">
+      <span class="tag">${escapeHTML(job.category)} Work</span>
+      <h3>${escapeHTML(job.work)}</h3>
+      <p><b>Manager:</b> ${escapeHTML(job.manager)}</p>
+      <p><b>Place:</b> ${escapeHTML(job.place)}</p>
+      <p><b>Minimum age:</b> ${escapeHTML(job.minAge)}</p>
+      <p><b>Date:</b> ${escapeHTML(job.date)} (${escapeHTML(job.day)})</p>
+      <p><b>Salary:</b> ${escapeHTML(job.salary)}</p>
+      <p><b>Timing:</b> ${escapeHTML(job.timing)}</p>
+      <p><b>Workers needed:</b> ${escapeHTML(job.count)}</p>
+      <p><b>Phone:</b> ${escapeHTML(job.phone)}</p>
+      <p><b>Email:</b> ${escapeHTML(job.email)}</p>
+      <div class="actions">
+        <button onclick="applyForJob('${job.id}')">Contact Manager</button>
+        <button class="danger" onclick="reportJob('${job.id}')">Report Fake Work</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function applyForJob(jobId) {
+  const job = readData(JOBS_KEY).find(item => item.id === jobId);
+  if (!job) return alert("This job is no longer available.");
+
+  const subject = encodeURIComponent("Work enquiry: " + job.work);
+  const body = encodeURIComponent(
+    "Hello " + job.manager + ",\n\n" +
+    "I am interested in: " + job.work + "\n" +
+    "My name: " + (worker?.name || "") + "\n" +
+    "My age: " + (worker?.age || "") + "\n" +
+    "My place: " + (worker?.place || "") + "\n" +
+    "My phone: " + (worker?.phone || "") + "\n\nThank you."
+  );
+
+  window.location.href =
+    "mailto:" + encodeURIComponent(job.email) +
+    "?subject=" + subject + "&body=" + body;
+}
+
+function renderManagerJobs() {
+  const container = document.getElementById("managerJobs");
+  const jobs = readData(JOBS_KEY);
+
+  if (!jobs.length) {
+    container.innerHTML =
+      '<div class="empty">No work has been posted yet.</div>';
+    return;
+  }
+
+  container.innerHTML = jobs.map(job => `
+    <article class="job-card">
+      <h3>${escapeHTML(job.work)}</h3>
+      <p>${escapeHTML(job.category)} Work</p>
+      <p><b>Manager:</b> ${escapeHTML(job.manager)}</p>
+      <p><b>Place:</b> ${escapeHTML(job.place)}</p>
+      <p><b>Salary:</b> ${escapeHTML(job.salary)}</p>
+      <div class="actions">
+        <button onclick="editJob('${job.id}')">Edit</button>
+        <button class="danger" onclick="deleteJob('${job.id}')">Delete</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function editJob(jobId) {
+  const job = readData(JOBS_KEY).find(item => item.id === jobId);
+  if (!job) return;
+
+  editingJobId = job.id;
+
+  const fields = {
+    mName: job.manager,
+    mWork: job.work,
+    mCategory: job.category,
+    mAge: job.minAge,
+    mPlace: job.place,
+    mDate: job.date,
+    mDay: job.day,
+    mSalary: job.salary,
+    mTiming: job.timing,
+    mCount: job.count,
+    mPhone: job.phone,
+    mEmail: job.email
+  };
+
+  Object.entries(fields).forEach(([id, value]) => {
+    document.getElementById(id).value = value ?? "";
+  });
+
+  document.getElementById("publishButton").textContent = "Save Changes";
+  document.getElementById("managerMessage").style.display = "none";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function deleteJob(jobId) {
+  if (!confirm("Delete this work listing?")) return;
+
+  saveData(
+    JOBS_KEY,
+    readData(JOBS_KEY).filter(job => job.id !== jobId)
+  );
+
+  renderManagerJobs();
+  renderJobs();
+  renderAdmin();
+}
+
+function prepareGeneralReport() {
+  document.getElementById("reportForm").reset();
+  go("reportPage");
+}
+
+function reportJob(jobId) {
+  const job = readData(JOBS_KEY).find(item => item.id === jobId);
+  if (!job) return alert("This job is no longer available.");
+
+  document.getElementById("rManager").value = job.manager;
+  document.getElementById("rWork").value = job.work;
+  document.getElementById("rPlace").value = job.place;
+  document.getElementById("rSalary").value = job.salary;
+  document.getElementById("rPhone").value = job.phone;
+  document.getElementById("rEmail").value = job.email;
+  document.getElementById("rReason").value = "Fake job listing";
+  document.getElementById("rDetails").value = "";
+
+  go("reportPage");
+}
+
+document.getElementById("reportForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const report = {
+    id: makeId(),
+    manager: document.getElementById("rManager").value.trim(),
+    work: document.getElementById("rWork").value.trim(),
+    place: document.getElementById("rPlace").value.trim(),
+    salary: document.getElementById("rSalary").value.trim(),
+    phone: document.getElementById("rPhone").value.trim(),
+    email: document.getElementById("rEmail").value.trim(),
+    reason: document.getElementById("rReason").value,
+    details: document.getElementById("rDetails").value.trim(),
+    status: "Pending review",
+    reportedAt: new Date().toISOString()
+  };
+
+  const reports = readData(REPORTS_KEY);
+  reports.unshift(report);
+  saveData(REPORTS_KEY, reports);
+
+  document.getElementById("reportForm").reset();
+  alert("Report saved in this browser. The creator can review it here.");
+  go("homePage");
+});
+
+function openCreatorDashboard() {
+  go("adminDashboard");
+}
+
+function renderAdmin() {
+  const reportsContainer = document.getElementById("reportsList");
+  const jobsContainer = document.getElementById("adminJobs");
+  const reports = readData(REPORTS_KEY);
+  const jobs = readData(JOBS_KEY);
+
+  if (!reports.length) {
+    reportsContainer.innerHTML =
+      '<div class="empty">No reports submitted yet.</div>';
+  } else {
+    reportsContainer.innerHTML = reports.map(report => `
+      <article class="report-card">
+        <span class="tag">${escapeHTML(report.status)}</span>
+        <h3>${escapeHTML(report.work)}</h3>
+        <p><b>Person:</b> ${escapeHTML(report.manager)}</p>
+        <p><b>Place:</b> ${escapeHTML(report.place)}</p>
+        <p><b>Salary:</b> ${escapeHTML(report.salary || "Not provided")}</p>
+        <p><b>Phone:</b> ${escapeHTML(report.phone || "Not provided")}</p>
+        <p><b>Email:</b> ${escapeHTML(report.email || "Not provided")}</p>
+        <p><b>Reason:</b> ${escapeHTML(report.reason)}</p>
+        <p><b>Details:</b> ${escapeHTML(report.details)}</p>
+        <p><b>Reported:</b> ${escapeHTML(report.reportedAt)}</p>
+        <div class="actions">
+          <button class="success" onclick="markReviewed('${report.id}')">Mark Reviewed</button>
+          <button class="danger" onclick="removeReportedJob('${report.id}')">Remove Matching Job</button>
+          <button class="secondary" onclick="deleteReport('${report.id}')">Delete Report</button>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  if (!jobs.length) {
+    jobsContainer.innerHTML =
+      '<div class="empty">No published work listings.</div>';
+  } else {
+    jobsContainer.innerHTML = jobs.map(job => `
+      <article class="job-card">
+        <h3>${escapeHTML(job.work)}</h3>
+        <p><b>Manager:</b> ${escapeHTML(job.manager)}</p>
+        <p><b>Category:</b> ${escapeHTML(job.category)}</p>
+        <p><b>Place:</b> ${escapeHTML(job.place)}</p>
+        <p><b>Salary:</b> ${escapeHTML(job.salary)}</p>
+        <p><b>Phone:</b> ${escapeHTML(job.phone)}</p>
+        <div class="actions">
+          <button class="danger" onclick="deleteJob('${job.id}')">Remove Listing</button>
+        </div>
+      </article>
+    `).join("");
+  }
+}
+
+function markReviewed(reportId) {
+  const reports = readData(REPORTS_KEY).map(report =>
+    report.id === reportId
+      ? { ...report, status: "Reviewed" }
+      : report
+  );
+
+  saveData(REPORTS_KEY, reports);
+  renderAdmin();
+}
+
+function removeReportedJob(reportId) {
+  const report = readData(REPORTS_KEY).find(item => item.id === reportId);
+  if (!report) return;
+
+  const jobs = readData(JOBS_KEY);
+
+  const matching = jobs.filter(job =>
+    job.work.toLowerCase() === report.work.toLowerCase() &&
+    job.manager.toLowerCase() === report.manager.toLowerCase() &&
+    job.place.toLowerCase() === report.place.toLowerCase()
+  );
+
+  if (!matching.length) {
+    alert("No exact matching job found. Check the listing details manually.");
+    return;
+  }
+
+  if (!confirm(
+    "Remove " + matching.length +
+    " matching listing(s)? Verify the report before proceeding."
+  )) return;
+
+  const ids = new Set(matching.map(job => job.id));
+
+  saveData(JOBS_KEY, jobs.filter(job => !ids.has(job.id)));
+
+  saveData(
+    REPORTS_KEY,
+    readData(REPORTS_KEY).map(item =>
+      item.id === reportId
+        ? { ...item, status: "Reviewed - matching listing removed" }
+        : item
+    )
+  );
+
+  renderAdmin();
+  renderManagerJobs();
+  renderJobs();
+}
+
+function deleteReport(reportId) {
+  if (!confirm("Delete this report from this browser?")) return;
+
+  saveData(
+    REPORTS_KEY,
+    readData(REPORTS_KEY).filter(report => report.id !== reportId)
+  );
+
+  renderAdmin();
+}
+
+renderJobs();
+</script>
+
+</body>
+</html>
